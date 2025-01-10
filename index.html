@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic M3U8 Player</title>
+    <!-- 引入 Video.js 样式 -->
+    <link href="https://vjs.zencdn.net/7.21.1/video-js.css" rel="stylesheet" />
+</head>
+<body>
+
+    <h1>播放 M3U8 视频</h1>
+
+    <!-- 输入框和按钮 -->
+    <input type="text" id="m3u8Input" placeholder="Enter M3U8 file name" />
+    <button onclick="loadVideo()">播放</button>
+
+    <!-- 视频元素 -->
+    <video id="video-player" class="video-js vjs-default-skin" controls preload="auto" width="640" height="360"></video>
+
+    <!-- 引入 Video.js 脚本 -->
+    <script src="https://vjs.zencdn.net/7.21.1/video.min.js"></script>
+    <!-- 引入 hls.js 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+    <script>
+        // 初始化视频播放器
+        var player = videojs('video-player');
+
+        function loadVideo() {
+            // 获取输入的文件名
+            var filename = document.getElementById('m3u8Input').value.trim();
+
+            if (!filename) {
+                alert('请输入有效的 M3U8 文件名');
+                return;
+            }
+
+            // 假设文件在当前服务器的同一目录下
+            var fileUrl = filename;
+
+            // 检查浏览器是否支持原生 HLS
+            if (player.canPlayType('application/vnd.apple.mpegurl')) {
+                // 设置视频源
+                player.src({
+                    src: fileUrl,
+                    type: 'application/vnd.apple.mpegurl'
+                });
+            } else if (Hls.isSupported()) {
+                // 使用 hls.js 来加载和播放 M3U8
+                var hls = new Hls();
+                hls.loadSource(fileUrl);
+                hls.attachMedia(player.tech_.el_);
+            } else {
+                console.error('This browser does not support HLS.');
+            }
+        }
+    </script>
+</body>
+</html>
